@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+
+import pyrealsense2 as rs
+import numpy as np
+import rospy
+from std_srvs.srv import Empty, EmptyResponse
+from geometry_msgs.msg import Twist, Vector3
+from tf_conversions import transformations
+import tf2_ros
+import geometry_msgs.msg
+
+from playsound import playsound
+
+class sound_board:
+    def __init__(self):
+        self.__robot_serve = rospy.Service("/robot_sound",Empty,self.robot_cb)
+        self.__pew_serve = rospy.Service("/pew_sound",Empty,self.pew_cb)
+        self.robotsound = 0
+        self.pewsound = 0
+        self.sound_loop()
+    
+    def robot_cb(self, req):
+        self.robotsound = 1
+        return EmptyResponse()
+    
+    def pew_cb(self, req):
+        self.pewsound = 1
+        return EmptyResponse()
+    
+    def sound_loop(self):
+        while True:
+
+            if self.robotsound==1:
+                playsound('robot_sound.mp3')
+                self.robotsound = 0
+            
+            if self.pewsound == 1 :
+                playsound('oof.mp3')
+                self.pewsound = 0
+
+
+
+
+if __name__=='__main__': # main run for node. inits node, runs class, and spins
+  '''
+  Your quintessential main function to run the class and init the node
+  INPUTS:
+      none
+  OUTPUTS:
+      Empty
+  '''
+  rospy.init_node('sound_node')
+  sound_board()
+  rospy.spin()
